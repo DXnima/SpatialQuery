@@ -398,7 +398,7 @@
     var map, geojson, layer_name, layerSwitcher, featureOverlay;
     var container, content, closer;
 
-    var geoService="http://localhost:8085";
+    var geoserverURL="http://localhost:8085";
 
     var container = document.getElementById('popup');
     var content = document.getElementById('popup-content');
@@ -465,7 +465,7 @@
           title: 'poly_landmarks',
           // extent: [-180, -90, -180, 90],
           source: new ol.source.ImageWMS({
-            url: geoService+'/geoserver/wms',
+            url: geoserverURL+'/geoserver/wms',
             params: { 'LAYERS': 'tiger:poly_landmarks' },
             ratio: 1,
             serverType: 'geoserver'
@@ -475,7 +475,7 @@
           title: 'tiger_roads',
           // extent: [-180, -90, -180, 90],
           source: new ol.source.ImageWMS({
-            url: geoService+'/geoserver/wms',
+            url: geoserverURL+'/geoserver/wms',
             params: { 'LAYERS': 'tiger:tiger_roads' },
             ratio: 1,
             serverType: 'geoserver'
@@ -499,7 +499,7 @@
       title: 'poi',
       // extent: [-180, -90, -180, 90],
       source: new ol.source.ImageWMS({
-        url: geoService+'/geoserver/wms',
+        url: geoserverURL+'/geoserver/wms',
         params: { 'LAYERS': 'tiger:poi' },
         ratio: 1,
         serverType: 'geoserver'
@@ -565,7 +565,7 @@
       var ar = [];
       var i;
       for (i = 0; i < no_layers; i++) {
-        ar.push(geoService+"/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=" + overlays.getLayers().item(i).get('title'));
+        ar.push(geoserverURL+"/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=" + overlays.getLayers().item(i).get('title'));
         //alert(overlays.getLayers().item(i).get('title'));
       }
       for (i = 0; i < no_layers; i++) {
@@ -619,7 +619,7 @@
           layer_title[i] = overlays.getLayers().item(i).get('title');
           //alert(layer_title[i]);
           wmsSource[i] = new ol.source.ImageWMS({
-            url: geoService+'/geoserver/wms',
+            url: geoserverURL+'/geoserver/wms',
             params: { 'LAYERS': layer_title[i] },
             serverType: 'geoserver',
             crossOrigin: 'anonymous'
@@ -1029,7 +1029,7 @@
       $(document).ready(function () {
         $.ajax({
           type: "GET",
-          url: geoService+"/geoserver/wms?request=getCapabilities",
+          url: geoserverURL+"/geoserver/wms?request=getCapabilities",
           dataType: "xml",
           success: function (xml) {
             $('#table_wms_layers').empty();
@@ -1136,7 +1136,7 @@
         title: name[1],
         // extent: [-180, -90, -180, 90],
         source: new ol.source.ImageWMS({
-          url: geoService+'/geoserver/wms',
+          url: geoserverURL+'/geoserver/wms',
           params: { 'LAYERS': layer_name },
           ratio: 1,
           serverType: 'geoserver'
@@ -1144,7 +1144,7 @@
       });
       overlays.getLayers().push(layer_wms);
 
-      var url = geoService+'/geoserver/wms?request=getCapabilities';
+      var url = geoserverURL+'/geoserver/wms?request=getCapabilities';
       var parser = new ol.format.WMSCapabilities();
 
 
@@ -1189,7 +1189,7 @@
     $(document).ready(function () {
       $.ajax({
         type: "GET",
-        url: geoService+"/geoserver/wfs?request=getCapabilities",
+        url: geoserverURL+"/geoserver/wfs?request=getCapabilities",
         dataType: "xml",
         success: function (xml) {
           var select = $('#layer');
@@ -1228,7 +1228,7 @@
         $(document).ready(function () {
           $.ajax({
             type: "GET",
-            url: geoService+"/geoserver/wfs?service=WFS&request=DescribeFeatureType&version=1.1.0&typeName=" + value_layer,
+            url: geoserverURL+"/geoserver/wfs?service=WFS&request=DescribeFeatureType&version=1.1.0&typeName=" + value_layer,
             dataType: "xml",
             success: function (xml) {
 
@@ -1499,7 +1499,7 @@
       //alert(value_txt);
 
 
-      var url = geoService+"/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=" + value_layer + "&CQL_FILTER=" + value_attribute + "+" + value_operator + "+'" + value_txt + "'&outputFormat=application/json"
+      var url = geoserverURL+"/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=" + value_layer + "&CQL_FILTER=" + value_attribute + "+" + value_operator + "+'" + value_txt + "'&outputFormat=application/json"
       //alert(url);
 
       var style = new ol.style.Style({
@@ -1619,7 +1619,7 @@
     $(document).ready(function () {
       $.ajax({
         type: "GET",
-        url: geoService+"/geoserver/wfs?request=getCapabilities",
+        url: geoserverURL+"/geoserver/wfs?request=getCapabilities",
         dataType: "xml",
         success: function (xml) {
           var select = $('#layer1');
