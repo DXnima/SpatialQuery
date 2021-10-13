@@ -322,30 +322,30 @@
 <body>
   <div id="title">
     <marquee behavior="scroll" direction="left">
-      <h5><b>Web based GIS Application</b></h5>
+      <h5><b>基于Web的GIS应用</b></h5>
     </marquee>
   </div>
   <div id="map">
 
     <form id="measure">
-      <label>Measurement type &nbsp;</label>
+      <label>测量类型 &nbsp;</label>
       <select id="measuretype">
-        <option value="select">Select Measure option</option>
-        <option value="length">Length (LineString)</option>
-        <option value="area">Area (Polygon)</option>
-        <option value="clear">Clear Measurement</option>
+        <option value="select">选择测量选项</option>
+        <option value="length">长度 (LineString)</option>
+        <option value="area">面积 (Polygon)</option>
+        <option value="clear">清除测量</option>
       </select>
     </form>
     <form id="getinfo">
-      <label>GetFeatureinfo&nbsp;</label>
+      <label>获取要素信息&nbsp;</label>
       <select id="getinfotype">
-        <option value="select">Select option</option>
-        <option value="activate_getinfo">Activate GetFeatureinfo</option>
-        <option value="deactivate_getinfo">Deactivate GetFeatureinfo</option>
+        <option value="select">选择选项</option>
+        <option value="activate_getinfo">激活获取</option>
+        <option value="deactivate_getinfo">停止获取</option>
       </select>
     </form>
-    <button onclick="wms_layers()" id="wms_layers_btn">Available WMS Layers</button>
-    <button onclick="clear_all()" id="clear_btn">Clear</button>
+    <button onclick="wms_layers()" id="wms_layers_btn">可用的WMS图层</button>
+    <button onclick="clear_all()" id="clear_btn">清除</button>
 
   </div>
 
@@ -359,51 +359,51 @@
   <div id="legend"></div>
   <div id="query_tab">
     <ul class="nav nav-tabs">
-      <li class="active"><a data-toggle="tab" href="#form">Select by Attributes</a></li>
-      <li><a data-toggle="tab" href="#form1">Select by Draw</a></li>
+      <li class="active"><a data-toggle="tab" href="#form">按属性选择</a></li>
+      <li><a data-toggle="tab" href="#form1">按绘图选择</a></li>
 
     </ul>
 
 
     <div class="tab-content">
       <div id="form" class="tab-pane fade in active">
-        <label for="layer">Select Layer</label>
+        <label for="layer">选择图层</label>
         <select class="form-control" id="layer" name="layer">
-          <option value="">Select Layer</option>
+          <option value="">选择图层</option>
         </select>
         <br>
-        <label for="attributes">Select attribute</label>
+        <label for="attributes">选择属性</label>
         <select class="form-control" id="attributes" name="attributes">
-          <option value="">Select Attributes</option>
+          <option value="">选择属性</option>
         </select>
         <br>
-        <label for="operator">Select operator</label>
+        <label for="operator">选择运输符</label>
         <select class="form-control" id="operator" name="operator">
-          <option value="">Select operator</option>
+          <option value="">选择运输符</option>
         </select>
         <br>
 
-        <label for="value">Enter Value</label>
+        <label for="value">输入值</label>
         <input type="text" class="form-control" id="value" name="value">
         <br>
-        <button class="btn btn-success" onclick="query()">Load Query</button>
+        <button class="btn btn-success" onclick="query()">查询</button>
       </div>
       <div id="form1" class="tab-pane fade">
-        <label for="layer1">Select Layer</label>
+        <label for="layer1">选择图层</label>
         <select class="form-control" id="layer1" name="layer1">
-          <option value="">Select Layer</option>
+          <option value="">选择图层</option>
         </select>
         <br>
-        <label for="attributes">Select attribute</label>
+        <label for="attributes">选择属性</label>
 
-        <label for="draw_type">Geometry type &nbsp;</label>
+        <label for="draw_type">几何图形类型 &nbsp;</label>
         <select class="form-control" id="draw_type" name="draw_type">
-          <option value="select">Select Shape</option>
-          <option value="Square">Square</option>
-          <option value="Box">Box</option>
-          <option value="Polygon">Polygon</option>
-          <option value="Star">Star</option>
-          <option value="clear">Clear</option>
+          <option value="select">选择形状</option>
+          <option value="Square">正方形</option>
+          <option value="Box">长方形</option>
+          <option value="Polygon">多边形</option>
+          <option value="Star">星形</option>
+          <option value="clear">清除</option>
         </select>
         <br>
 
@@ -412,7 +412,7 @@
 
   </div>
   <div id="table_data"> </div>
-  <div id="wms_layers_window" title="Available WMS Layers" style="display:none"></div>
+  <div id="wms_layers_window" title="可用的WMS图层" style="display:none"></div>
   <table id="table_wms_layers" class="table-bordered">
   </table>
 
@@ -420,6 +420,7 @@
     var map, geojson, layer_name, layerSwitcher, featureOverlay;
     var container, content, closer;
 
+    //GeoServer路径
     var geoService="http://localhost:8085";
     
     var container = document.getElementById('popup');
@@ -428,7 +429,7 @@
 
 
     /**
-     * Create an overlay to anchor the popup to the map.
+     * 创建覆盖以将弹出窗口锚定到地图
      */
     var overlay = new ol.Overlay({
       element: container,
@@ -440,7 +441,7 @@
 
 
     /**
-     * Add a click handler to hide the popup.
+     * 添加单击处理程序以隐藏弹出窗口
      * @return {boolean} Don't follow the href.
      */
     closer.onclick = function () {
@@ -463,7 +464,7 @@
 
 
     var base_maps = new ol.layer.Group({
-      'title': 'Base maps',
+      'title': '基础底图',
       layers: [
         new ol.layer.Tile({
           title: 'OSM',
@@ -481,7 +482,7 @@
     });
 
     var overlays = new ol.layer.Group({
-      'title': 'Overlays',
+      'title': '图层',
       layers: [
         new ol.layer.Image({
           title: 'poly_landmarks',
@@ -566,8 +567,8 @@
     var layerSwitcher = new ol.control.LayerSwitcher({
       activationMode: 'click',
       startActive: true,
-      tipLabel: 'Layers', // Optional label for button
-      groupSelectStyle: 'children', // Can be 'children' [default], 'group' or 'none'
+      tipLabel: 'Layers', //按钮的可选标签
+      groupSelectStyle: 'children', // 可选 'children' [default], 'group' or 'none'
       collapseTipLabel: 'Collapse layers',
     });
     map.addControl(layerSwitcher);
@@ -580,7 +581,7 @@
 
       var head = document.createElement("h4");
 
-      var txt = document.createTextNode("Legend");
+      var txt = document.createTextNode("图例");
 
       head.appendChild(txt);
       var element = document.getElementById("legend");
@@ -704,7 +705,7 @@
       }
     };
 
-    // measure tool
+    // 测量工具
 
     var source = new ol.source.Vector();
     var vectorLayer = new ol.layer.Vector({
@@ -734,56 +735,56 @@
 
 
     /**
-       * Currently drawn feature.
+       * 当前绘制的要素.
        * @type {module:ol/Feature~Feature}
        */
     var sketch;
 
 
     /**
-     * The help tooltip element.
+     * 帮助工具提示元素.
      * @type {Element}
      */
     var helpTooltipElement;
 
 
     /**
-     * Overlay to show the help messages.
+     * 覆盖以显示帮助消息.
      * @type {module:ol/Overlay}
      */
     var helpTooltip;
 
 
     /**
-     * The measure tooltip element.
+     * 度量工具提示元素.
      * @type {Element}
      */
     var measureTooltipElement;
 
 
     /**
-     * Overlay to show the measurement.
+     * 叠加显示测量值.
      * @type {module:ol/Overlay}
      */
     var measureTooltip;
 
 
     /**
-     * Message to show when the user is drawing a polygon.
+     * 用户绘制多边形时显示的消息.
      * @type {string}
      */
-    var continuePolygonMsg = 'Click to continue drawing the polygon';
+    var continuePolygonMsg = '单击以继续绘制多边形';
 
 
     /**
-     * Message to show when the user is drawing a line.
+     * 当用户绘制直线时显示的消息.
      * @type {string}
      */
-    var continueLineMsg = 'Click to continue drawing the line';
+    var continueLineMsg = '单击以继续绘制线';
 
 
     /**
-     * Handle pointer move.
+     * 手柄指针移动.
      * @param {module:ol/MapBrowserEvent~MapBrowserEvent} evt The event.
      */
     var pointerMoveHandler = function (evt) {
@@ -817,11 +818,11 @@
 
     //var measuretype = document.getElementById('measuretype');
 
-    var draw; // global so we can remove it later
+    var draw; // 全局，以便我们稍后删除它
 
 
     /**
-     * Format length output.
+     * 格式长度输出.
      * @param {module:ol/geom/LineString~LineString} line The line.
      * @return {string} The formatted length.
      */
@@ -846,7 +847,7 @@
 
 
     /**
-     * Format area output.
+     * 格式面积输出.
      * @param {module:ol/geom/Polygon~Polygon} polygon The polygon.
      * @return {string}// Formatted area.
      */
@@ -963,9 +964,9 @@
           function () {
             measureTooltipElement.className = 'tooltip tooltip-static';
             measureTooltip.setOffset([0, -7]);
-            // unset sketch
+            // 未设置草图
             sketch = null;
-            // unset tooltip so that a new one can be created
+            // 取消设置工具提示以便可以创建新的工具提示
             measureTooltipElement = null;
             createMeasureTooltip();
             ol.Observable.unByKey(listener);
@@ -974,7 +975,7 @@
     }
 
     /**
-     * Creates a new help tooltip
+     *创建新的帮助工具提示
      */
     function createHelpTooltip() {
       if (helpTooltipElement) {
@@ -1010,7 +1011,7 @@
 
 
     /**
-     * Let user change the geometry type.
+     * 允许用户更改几何图形类型.
      */
     measuretype.onchange = function () {
       map.un('singleclick', getinfo);
@@ -1089,7 +1090,7 @@
         var heads = table.getElementsByTagName('th');
         var col_no;
         for (var i = 0; i < heads.length; i++) {
-          // Take each cell
+          // 取每个行
           var head = heads[i];
           //alert(head.innerHTML);
           if (head.innerHTML == 'Name') {
@@ -1184,7 +1185,7 @@
       //map.addLayer(layer_wms);
     }
 
-    // layers_name
+    // 图层名称
     $(document).ready(function () {
       $.ajax({
         type: "GET",
@@ -1207,7 +1208,7 @@
       });
     });
 
-    // attributes_dropdown
+    // 属性下拉列表
     $(function () {
       $("#layer").change(function () {
 
@@ -1225,7 +1226,7 @@
         // var url = geoService+"/geoserver/wfs?geoService=WFS&request=DescribeFeatureType&version=1.1.0&typeName="+value_layer;
         //  alert(url);
 
-        attributes.options[0] = new Option('Select attributes', "");
+        attributes.options[0] = new Option('选择属性', "");
         //  alert(url);
 
         $(document).ready(function () {
@@ -1256,7 +1257,7 @@
       });
     });
 
-    // operator combo
+    // 运算符组合框
     $(function () {
       $("#attributes").change(function () {
 
@@ -1268,7 +1269,7 @@
         var value_type = $(this).val();
         // alert(value_type);
         var value_attribute = $('#attributes option:selected').text();
-        operator.options[0] = new Option('Select operator', "");
+        operator.options[0] = new Option('选择运算符', "");
 
         if (value_type == 'xsd:short' || value_type == 'xsd:int' || value_type == 'xsd:double') {
           var operator1 = document.getElementById("operator");
@@ -1547,17 +1548,17 @@
 
         table.setAttribute("class", "table table-bordered");
         table.setAttribute("id", "table");
-        // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+        // 使用上面提取的标题创建HTML表格标题行.
 
-        var tr = table.insertRow(-1);                   // TABLE ROW.
+        var tr = table.insertRow(-1);                   // 表格行.
 
         for (var i = 0; i < col.length; i++) {
-          var th = document.createElement("th");      // TABLE HEADER.
+          var th = document.createElement("th");      // 表格头.
           th.innerHTML = col[i];
           tr.appendChild(th);
         }
 
-        // ADD JSON DATA TO THE TABLE AS ROWS.
+        // 将JSON数据作为行添加到表中.
         for (var i = 0; i < data.features.length; i++) {
 
           tr = table.insertRow(-1);
@@ -1573,7 +1574,7 @@
           }
         }
 
-        // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+        // 最后，将新创建的包含JSON数据的表添加到容器中.
         var divContainer = document.getElementById("table_data");
         divContainer.innerHTML = "";
         divContainer.appendChild(table);
@@ -1587,7 +1588,7 @@
       addRowHandlers();
     }
 
-    // Draw_layer_dropdown
+    // 绘制图层下拉列表
     $(document).ready(function () {
       $.ajax({
         type: "GET",
@@ -1610,7 +1611,7 @@
       });
     });
 
-    // draw shapes
+    // 绘制形状
     var source1 = new ol.source.Vector({ wrapX: false });
 
     var vector1 = new ol.layer.Vector({
@@ -1772,17 +1773,17 @@
 
               table.setAttribute("class", "table table-bordered");
               table.setAttribute("id", "table");
-              // CREATE HTML TABLE HEADER ROW USING THE EXTRACTED HEADERS ABOVE.
+              // 使用上面提取的标题创建HTML表格标题行.
 
-              var tr = table.insertRow(-1);                   // TABLE ROW.
+              var tr = table.insertRow(-1);                   // 表格行.
 
               for (var i = 0; i < col.length; i++) {
-                var th = document.createElement("th");      // TABLE HEADER.
+                var th = document.createElement("th");      // 表头.
                 th.innerHTML = col[i];
                 tr.appendChild(th);
               }
 
-              // ADD JSON DATA TO THE TABLE AS ROWS.
+              // 将JSON数据作为行添加到表中.
               for (var i = 0; i < data.features.length; i++) {
 
                 tr = table.insertRow(-1);
@@ -1798,7 +1799,7 @@
                 }
               }
 
-              // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+              // 最后，将新创建的包含JSON数据的表添加到容器中.
               var divContainer = document.getElementById("table_data");
               divContainer.innerHTML = "";
               divContainer.appendChild(table);
@@ -1816,7 +1817,7 @@
     }
 
     /**
-     * Handle change event.
+     * 处理更改事件.
      */
     draw_typeSelect.onchange = function () {
       map.removeInteraction(draw1);

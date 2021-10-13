@@ -1615,6 +1615,29 @@
 
     }
 
+    // 绘制图层下拉列表
+    $(document).ready(function () {
+      $.ajax({
+        type: "GET",
+        url: geoService+"/geoserver/wfs?request=getCapabilities",
+        dataType: "xml",
+        success: function (xml) {
+          var select = $('#layer1');
+          $(xml).find('FeatureType').each(function () {
+            //var title = $(this).find('ows:Operation').attr('name');
+            //alert(title);
+            var name = $(this).find('Name').text();
+            //select.append("<option/><option class='ddheader' value='"+ name +"'>"+title+"</option>");
+            $(this).find('Name').each(function () {
+              var value = $(this).text();
+              select.append("<option class='ddindent' value='" + value + "'>" + value + "</option>");
+            });
+          });
+          //select.children(":first").text("please make a selection").attr("selected",true);
+        }
+      });
+    });
+
     function clear_all() {
       document.getElementById('map').style.height = '96%';
       document.getElementById('table_data').style.height = '0%';
