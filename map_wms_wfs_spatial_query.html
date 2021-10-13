@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="libs/v6.5.0/examples/resources/layout.css" type="text/css">
   <link rel="stylesheet" href="libs/ol-layerswitcher/dist/ol-layerswitcher.css" />
 
-
   <script src="libs/v6.5.0/build/ol.js"></script>
   <script src="libs/ol-layerswitcher/dist/ol-layerswitcher.js"></script>
   <script src="libs/jquery.min.js"></script>
@@ -25,7 +24,6 @@
       padding: 0;
       margin: 0;
       font-family: arial;
-
     }
 
     #title {
@@ -280,7 +278,6 @@
     }
 
     .modal-dialog {
-
       height: 300px;
     }
 
@@ -315,7 +312,6 @@
       font-size: 1.1em;
     }
   </style>
-
   <title>OpenLayers example</title>
 </head>
 
@@ -326,7 +322,6 @@
     </marquee>
   </div>
   <div id="map">
-
     <form id="measure">
       <label>测量类型 &nbsp;</label>
       <select id="measuretype">
@@ -346,7 +341,6 @@
     </form>
     <button onclick="wms_layers()" id="wms_layers_btn">可用的WMS图层</button>
     <button onclick="clear_all()" id="clear_btn">清除</button>
-
   </div>
 
   <div id="popup" class="ol-popup">
@@ -355,15 +349,12 @@
   </div>
   <div id="info">&nbsp;</div>
 
-
   <div id="legend"></div>
   <div id="query_tab">
     <ul class="nav nav-tabs">
       <li class="active"><a data-toggle="tab" href="#form">按属性选择</a></li>
       <li><a data-toggle="tab" href="#form1">按绘图选择</a></li>
-
     </ul>
-
 
     <div class="tab-content">
       <div id="form" class="tab-pane fade in active">
@@ -406,7 +397,6 @@
           <option value="clear">清除</option>
         </select>
         <br>
-
       </div>
     </div>
 
@@ -420,16 +410,15 @@
     var map, geojson, layer_name, layerSwitcher, featureOverlay;
     var container, content, closer;
 
-    //GeoServer路径
-    var geoService="http://localhost:8085";
-    
+    //geoserver路径
+    var geoserverURL='http://localhost:8085';
+
     var container = document.getElementById('popup');
     var content = document.getElementById('popup-content');
     var closer = document.getElementById('popup-closer');
 
-
     /**
-     * 创建覆盖以将弹出窗口锚定到地图
+     * 创建覆盖以将弹出窗口锚定到地图.
      */
     var overlay = new ol.Overlay({
       element: container,
@@ -439,9 +428,8 @@
       }
     });
 
-
     /**
-     * 添加单击处理程序以隐藏弹出窗口
+     * 添加单击处理程序以隐藏弹出窗口.
      * @return {boolean} Don't follow the href.
      */
     closer.onclick = function () {
@@ -453,18 +441,16 @@
     var view = new ol.View({
       projection: 'EPSG:4326',
       center: [-73.97, 40.77],
-      zoom: 12,
-
+      zoom: 13,
     });
     var view_ov = new ol.View({
       projection: 'EPSG:4326',
       center: [-73.97, 40.77],
-      zoom: 12,
+      zoom: 13,
     });
 
-
     var base_maps = new ol.layer.Group({
-      'title': '基础底图',
+      'title': '基础地图',
       layers: [
         new ol.layer.Tile({
           title: 'OSM',
@@ -488,9 +474,9 @@
           title: 'poly_landmarks',
           // extent: [-180, -90, -180, 90],
           source: new ol.source.ImageWMS({
-            url: geoService+'/geoserver/wms',
+            url: geoserverURL+'/geoserver/wms',
             params: { 'LAYERS': 'tiger:poly_landmarks' },
-            
+
             ratio: 1,
             serverType: 'geoserver'
           })
@@ -499,16 +485,14 @@
           title: 'tiger_roads',
           // extent: [-180, -90, -180, 90],
           source: new ol.source.ImageWMS({
-            url: geoService+'/geoserver/wms',
+            url: geoserverURL+'/geoserver/wms',
             params: { 'LAYERS': 'tiger:tiger_roads' },
             ratio: 1,
             serverType: 'geoserver'
           })
         })
-
       ]
     });
-
 
     var map = new ol.Map({
       target: 'map',
@@ -523,7 +507,7 @@
       title: 'poi',
       // extent: [-180, -90, -180, 90],
       source: new ol.source.ImageWMS({
-        url: geoService+'/geoserver/wms',
+        url: geoserverURL+'/geoserver/wms',
         params: { 'LAYERS': 'tiger:poi' },
         ratio: 1,
         serverType: 'geoserver'
@@ -531,11 +515,8 @@
     });
 
     overlays.getLayers().push(rainfall);
-    //map.addLayer(rainfall);
-
     var mouse_position = new ol.control.MousePosition();
     map.addControl(mouse_position);
-
     var overview = new ol.control.OverviewMap({
       view: view_ov,
       collapseLabel: 'O',
@@ -554,8 +535,6 @@
     var slider = new ol.control.ZoomSlider();
     map.addControl(slider);
 
-
-
     var zoom_ex = new ol.control.ZoomToExtent({
       extent: [
         65.90, 7.48,
@@ -567,116 +546,70 @@
     var layerSwitcher = new ol.control.LayerSwitcher({
       activationMode: 'click',
       startActive: true,
-      tipLabel: 'Layers', //按钮的可选标签
-      groupSelectStyle: 'children', // 可选 'children' [default], 'group' or 'none'
+      tipLabel: 'Layers', // 按钮的可选标签
+      groupSelectStyle: 'children', // Can be 'children' [default], 'group' or 'none'
       collapseTipLabel: 'Collapse layers',
     });
     map.addControl(layerSwitcher);
 
     function legend() {
-
       $('#legend').empty();
-
       var no_layers = overlays.getLayers().get('length');
-
       var head = document.createElement("h4");
-
       var txt = document.createTextNode("图例");
-
       head.appendChild(txt);
       var element = document.getElementById("legend");
       element.appendChild(head);
       var ar = [];
       var i;
       for (i = 0; i < no_layers; i++) {
-        ar.push(geoService+"/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=" + overlays.getLayers().item(i).get('title'));
-        //alert(overlays.getLayers().item(i).get('title'));
+        ar.push(geoserverURL+"/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=" + overlays.getLayers().item(i).get('title'));
       }
       for (i = 0; i < no_layers; i++) {
         var head = document.createElement("p");
-
         var txt = document.createTextNode(overlays.getLayers().item(i).get('title'));
-        //alert(txt[i]);
         head.appendChild(txt);
         var element = document.getElementById("legend");
         element.appendChild(head);
         var img = new Image();
         img.src = ar[i];
-
         var src = document.getElementById("legend");
         src.appendChild(img);
-
       }
-
     }
-
     legend();
 
     function getinfo(evt) {
       var coordinate = evt.coordinate;
       var viewResolution = /** @type {number} */ (view.getResolution());
-
-      //alert(coordinate1);
       $("#popup-content").empty();
-
       document.getElementById('info').innerHTML = '';
       var no_layers = overlays.getLayers().get('length');
-      // alert(no_layers);
       var url = new Array();
       var wmsSource = new Array();
       var layer_title = new Array();
-
-
       var i;
       for (i = 0; i < no_layers; i++) {
-        //alert(overlays.getLayers().item(i).getVisible());
         var visibility = overlays.getLayers().item(i).getVisible();
-        //alert(visibility);
         if (visibility == true) {
-          //alert(i);
           layer_title[i] = overlays.getLayers().item(i).get('title');
-          //alert(layer_title[i]);
           wmsSource[i] = new ol.source.ImageWMS({
-            url: geoService+'/geoserver/wms',
+            url: geoserverURL+'/geoserver/wms',
             params: { 'LAYERS': layer_title[i] },
             serverType: 'geoserver',
             crossOrigin: 'anonymous'
           });
-          //alert(wmsSource[i]);
-          //var coordinate2 = evt.coordinate;
-          // alert(coordinate);
           url[i] = wmsSource[i].getFeatureInfoUrl(
             evt.coordinate, viewResolution, 'EPSG:4326',
             { 'INFO_FORMAT': 'text/html' });
-          //  alert(url[i]);
-
-          //assuming you use jquery
           $.get(url[i], function (data) {
-            //alert(i);
-            //append the returned html data
-
-
-            // $("#info").html(data);
-            //document.getElementById('info').innerHTML = data;
-            //document.getElementById('popup-content').innerHTML = '<p>Feature Info</p><code>' + data + '</code>';
-
-            //alert(dat[i]);
             $("#popup-content").append(data);
-            //document.getElementById('popup-content').innerHTML = '<p>Feature Info</p><code>' + data + '</code>';
-
             overlay.setPosition(coordinate);
-
             layerSwitcher.renderPanel();
-
           });
-          //alert(layer_title[i]);
-          //alert(fid1[0]);
         }
       }
     }
-
-    //map.on('singleclick', getinfo);
-    // map.un('singleclick', getinfo);
 
     getinfotype.onchange = function () {
       map.removeInteraction(draw);
@@ -684,19 +617,12 @@
       map.removeOverlay(helpTooltip);
       if (measureTooltipElement) {
         var elem = document.getElementsByClassName("tooltip tooltip-static");
-
         for (var i = elem.length - 1; i >= 0; i--) {
-
           elem[i].remove();
-          //alert(elem[i].innerHTML);
         }
       }
-
       if (getinfotype.value == 'activate_getinfo') {
-
         map.on('singleclick', getinfo);
-
-
       }
       else if (getinfotype.value == 'select' || getinfotype.value == 'deactivate_getinfo') {
         map.un('singleclick', getinfo);
@@ -705,8 +631,7 @@
       }
     };
 
-    // 测量工具
-
+    // measure tool
     var source = new ol.source.Vector();
     var vectorLayer = new ol.layer.Vector({
       //title: 'layer',
@@ -727,12 +652,7 @@
         })
       })
     });
-
-    //overlays.getLayers().push(vectorLayer);
     map.addLayer(vectorLayer);
-
-    //layerSwitcher.renderPanel();
-
 
     /**
        * 当前绘制的要素.
@@ -777,10 +697,10 @@
 
 
     /**
-     * 当用户绘制直线时显示的消息.
+     * Message to show when the user is drawing a line.
      * @type {string}
      */
-    var continueLineMsg = '单击以继续绘制线';
+    var continueLineMsg = '单击以继续绘制多边线';
 
 
     /**
@@ -818,7 +738,7 @@
 
     //var measuretype = document.getElementById('measuretype');
 
-    var draw; // 全局，以便我们稍后删除它
+    var draw; // global so we can remove it later
 
 
     /**
@@ -828,23 +748,17 @@
      */
     var formatLength = function (line) {
       var length = ol.sphere.getLength(line, { projection: 'EPSG:4326' });
-      //var length = getLength(line);
-      //var length = line.getLength({projection:'EPSG:4326'});
-
       var output;
       if (length > 100) {
         output = (Math.round(length / 1000 * 100) / 100) +
           ' ' + 'km';
-
       } else {
         output = (Math.round(length * 100) / 100) +
           ' ' + 'm';
-
       }
       return output;
 
     };
-
 
     /**
      * 格式面积输出.
@@ -852,10 +766,7 @@
      * @return {string}// Formatted area.
      */
     var formatArea = function (polygon) {
-      // var area = getArea(polygon);
       var area = ol.sphere.getArea(polygon, { projection: 'EPSG:4326' });
-      // var area = polygon.getArea();
-      //alert(area);
       var output;
       if (area > 10000) {
         output = (Math.round(area / 1000000 * 100) / 100) +
@@ -868,11 +779,9 @@
     };
 
     function addInteraction() {
-
       var type;
       if (measuretype.value == 'area') { type = 'Polygon'; }
       else if (measuretype.value == 'length') { type = 'LineString'; }
-      //alert(type);
 
       //var type = (measuretype.value == 'area' ? 'Polygon' : 'LineString');
       draw = new ol.interaction.Draw({
@@ -900,41 +809,27 @@
       });
 
       if (measuretype.value == 'select' || measuretype.value == 'clear') {
-
         map.removeInteraction(draw);
         if (vectorLayer) { vectorLayer.getSource().clear(); }
         map.removeOverlay(helpTooltip);
-
         if (measureTooltipElement) {
           var elem = document.getElementsByClassName("tooltip tooltip-static");
           //$('#measure_tool').empty(); 
-
-          //alert(elem.length);
           for (var i = elem.length - 1; i >= 0; i--) {
-
             elem[i].remove();
-            //alert(elem[i].innerHTML);
           }
         }
-
         //var elem1 = elem[0].innerHTML;
-        //alert(elem1);
 
       }
-
       else if (measuretype.value == 'area' || measuretype.value == 'length') {
-
         map.addInteraction(draw);
         createMeasureTooltip();
         createHelpTooltip();
-
         var listener;
         draw.on('drawstart',
           function (evt) {
-            // set sketch
-
-
-            //vectorLayer.getSource().clear();
+            // 设置草图
 
             sketch = evt.feature;
 
@@ -943,15 +838,12 @@
 
             listener = sketch.getGeometry().on('change', function (evt) {
               var geom = evt.target;
-
               var output;
               if (geom instanceof ol.geom.Polygon) {
-
                 output = formatArea(geom);
                 tooltipCoord = geom.getInteriorPoint().getCoordinates();
 
               } else if (geom instanceof ol.geom.LineString) {
-
                 output = formatLength(geom);
                 tooltipCoord = geom.getLastCoordinate();
               }
@@ -971,11 +863,12 @@
             createMeasureTooltip();
             ol.Observable.unByKey(listener);
           }, this);
+
       }
     }
 
     /**
-     *创建新的帮助工具提示
+     * 创建新的帮助工具提示
      */
     function createHelpTooltip() {
       if (helpTooltipElement) {
@@ -992,7 +885,7 @@
     }
 
     /**
-     * Creates a new measure tooltip
+     * 创建新的度量工具提示
      */
     function createMeasureTooltip() {
       if (measureTooltipElement) {
@@ -1000,18 +893,18 @@
       }
       measureTooltipElement = document.createElement('div');
       measureTooltipElement.className = 'tooltip tooltip-measure';
-
       measureTooltip = new ol.Overlay({
         element: measureTooltipElement,
         offset: [0, -15],
         positioning: 'bottom-center'
       });
       map.addOverlay(measureTooltip);
+
     }
 
 
     /**
-     * 允许用户更改几何图形类型.
+     * 允许用户更改几何图形类型
      */
     measuretype.onchange = function () {
       map.un('singleclick', getinfo);
@@ -1021,10 +914,8 @@
       addInteraction();
     };
 
-    // wms_layers_window
-
+    // wms图层窗口
     function wms_layers() {
-      //alert('jdgf');
       $(function () {
         $("#wms_layers_window").dialog({
           height: 400,
@@ -1033,11 +924,10 @@
         });
         $("#wms_layers_window").show();
       });
-
       $(document).ready(function () {
         $.ajax({
           type: "GET",
-          url: geoService+"/geoserver/wms?request=getCapabilities",
+          url: geoserverURL+"/geoserver/wms?request=getCapabilities",
           dataType: "xml",
           success: function (xml) {
             $('#table_wms_layers').empty();
@@ -1045,13 +935,11 @@
             $('<tr></tr>').html('<th>Name</th><th>Title</th><th>Abstract</th>').appendTo('#table_wms_layers');
             $(xml).find('Layer').find('Layer').each(function () {
               var name = $(this).children('Name').text();
-              // alert(name);
               //var name1 = name.find('Name').text();
-              //alert(name);
+             
               var title = $(this).children('Title').text();
+
               var abst = $(this).children('Abstract').text();
-              //   alert(abst);
-              //   alert('test');
               $('<tr></tr>').html('<td>' + name + '</td><td>' + title + '</td><td>' + abst + '</td>').appendTo('#table_wms_layers');
             });
             addRowHandlers();
@@ -1066,9 +954,10 @@
       $("#wms_layers_window").show();
       var add_map_btn = document.createElement("BUTTON");
       add_map_btn.setAttribute("id", "add_map_btn");
-      add_map_btn.innerHTML = "Add Layer to Map";
+      add_map_btn.innerHTML = "添加图层到地图";
       add_map_btn.setAttribute("onclick", "add_layer()");
       divContainer.appendChild(add_map_btn);
+
       /*	function findRowNumber(cn1, v1){
       var table = document.querySelector('#table1');
       var rows = table.querySelectorAll("tr");
@@ -1083,23 +972,19 @@
       return msg;
     }
     */
+
       function addRowHandlers() {
-        //alert('knd');
         var rows = document.getElementById("table_wms_layers").rows;
         var table = document.getElementById('table_wms_layers');
         var heads = table.getElementsByTagName('th');
         var col_no;
         for (var i = 0; i < heads.length; i++) {
-          // 取每个行
           var head = heads[i];
-          //alert(head.innerHTML);
           if (head.innerHTML == 'Name') {
             col_no = i + 1;
-            //alert(col_no);
           }
         }
         for (i = 0; i < rows.length; i++) {
-
           rows[i].onclick = function () {
             return function () {
               $(function () {
@@ -1109,7 +994,6 @@
               });
               var cell = this.cells[col_no - 1];
               layer_name = cell.innerHTML;
-              // alert(layer_name);
               $(document).ready(function () {
                 $("#table_wms_layers td:nth-child(" + col_no + ")").each(function () {
                   if ($(this).text() == layer_name) {
@@ -1117,7 +1001,6 @@
                   }
                 });
               });
-              //alert("id:" + id);
             };
           }(rows[i]);
         }
@@ -1127,51 +1010,40 @@
              alert(layer_name);
          });*/
       }
+
     }
 
     function add_layer() {
-      //alert("jd"); 
-      //alert(layer_name);
-      //map.removeControl(layerSwitcher);
       var name = layer_name.split(":");
       var layer_wms = new ol.layer.Image({
         title: name[1],
         // extent: [-180, -90, -180, 90],
         source: new ol.source.ImageWMS({
-          url: geoService+'/geoserver/wms',
+          url: geoserverURL+'/geoserver/wms',
           params: { 'LAYERS': layer_name },
           ratio: 1,
           serverType: 'geoserver'
         })
       });
       overlays.getLayers().push(layer_wms);
-
-      var url = geoService+'/geoserver/wms?request=getCapabilities';
+      var url = geoserverURL+'/geoserver/wms?request=getCapabilities';
       var parser = new ol.format.WMSCapabilities();
+
       $.ajax(url).then(function (response) {
-        //window.alert("word");
         var result = parser.read(response);
-        // console.log(result);
-        // window.alert(result);
         var Layers = result.Capability.Layer.Layer;
         var extent;
         for (var i = 0, len = Layers.length; i < len; i++) {
-
           var layerobj = Layers[i];
-          //  window.alert(layerobj.Name);
-
           if (layerobj.Name == layer_name) {
             extent = layerobj.BoundingBox[0].extent;
-            //alert(extent);
             map.getView().fit(
               extent,
               { duration: 1590, size: map.getSize() }
             );
-
           }
         }
       });
-      //alert(layer_wms.get('source').get('extent'));
       /*layer_wms.getSource().on('singleclick', function(){
       map.getView().fit(
           layer_wms.getExtent(),
@@ -1180,22 +1052,19 @@
    });*/
 
       layerSwitcher.renderPanel();
-      //map.addControl(layerSwitcher);
       legend();
-      //map.addLayer(layer_wms);
     }
 
-    // 图层名称
+    // layers_name
     $(document).ready(function () {
       $.ajax({
         type: "GET",
-        url: geoService+"/geoserver/wfs?request=getCapabilities",
+        url: geoserverURL+"/geoserver/wfs?request=getCapabilities",
         dataType: "xml",
         success: function (xml) {
           var select = $('#layer');
           $(xml).find('FeatureType').each(function () {
             //var title = $(this).find('ows:Operation').attr('name');
-            //alert(title);
             var name = $(this).find('Name').text();
             //select.append("<option/><option class='ddheader' value='"+ name +"'>"+title+"</option>");
             $(this).find('Name').each(function () {
@@ -1211,41 +1080,30 @@
     // 属性下拉列表
     $(function () {
       $("#layer").change(function () {
-
         var attributes = document.getElementById("attributes");
         var length = attributes.options.length;
         for (i = length - 1; i >= 0; i--) {
           attributes.options[i] = null;
         }
-
         var value_layer = $(this).val();
-        //alert(value_crop);
 
         //var level = document.getElementById("level");
         //var value_level = level.options[level.selectedIndex].value;
-        // var url = geoService+"/geoserver/wfs?geoService=WFS&request=DescribeFeatureType&version=1.1.0&typeName="+value_layer;
-        //  alert(url);
+        // var url = geoserverURL+"/geoserver/wfs?service=WFS&request=DescribeFeatureType&version=1.1.0&typeName="+value_layer;
 
-        attributes.options[0] = new Option('选择属性', "");
-        //  alert(url);
-
+        attributes.options[0] = new Option('选择要素', "");
         $(document).ready(function () {
           $.ajax({
             type: "GET",
-            url: geoService+"/geoserver/wfs?geoService=WFS&request=DescribeFeatureType&version=1.1.0&typeName=" + value_layer,
+            url: geoserverURL+"/geoserver/wfs?service=WFS&request=DescribeFeatureType&version=1.1.0&typeName=" + value_layer,
             dataType: "xml",
             success: function (xml) {
-
               var select = $('#attributes');
               //var title = $(xml).find('xsd\\:complexType').attr('name');
-              //	alert(title);
               $(xml).find('xsd\\:sequence').each(function () {
-
                 $(this).find('xsd\\:element').each(function () {
                   var value = $(this).attr('name');
-                  //alert(value);
                   var type = $(this).attr('type');
-                  //alert(type);
                   if (value != 'geom' && value != 'the_geom') {
                     select.append("<option class='ddindent' value='" + type + "'>" + value + "</option>");
                   }
@@ -1267,20 +1125,19 @@
           operator.options[i] = null;
         }
         var value_type = $(this).val();
-        // alert(value_type);
         var value_attribute = $('#attributes option:selected').text();
         operator.options[0] = new Option('选择运算符', "");
-
         if (value_type == 'xsd:short' || value_type == 'xsd:int' || value_type == 'xsd:double') {
           var operator1 = document.getElementById("operator");
-          operator1.options[1] = new Option('Greater than', '>');
-          operator1.options[2] = new Option('Less than', '<');
-          operator1.options[3] = new Option('Equal to', '=');
+          operator1.options[1] = new Option('大于(>)', '>');
+          operator1.options[2] = new Option('小于(<)', '<');
+          operator1.options[3] = new Option('等于(=)', '=');
         }
         else if (value_type == 'xsd:string') {
           var operator1 = document.getElementById("operator");
-          operator1.options[1] = new Option('Like', 'ILike');
+          operator1.options[1] = new Option('相似(Like)', 'ILike');
         }
+
       });
     });
 
@@ -1326,13 +1183,11 @@
       var heads = table.getElementsByTagName('th');
       var col_no;
       for (var i = 0; i < heads.length; i++) {
-        // Take each cell
         var head = heads[i];
-        //alert(head.innerHTML);
         if (head.innerHTML == 'id') {
           col_no = i + 1;
-          //alert(col_no);
         }
+
       }
       for (i = 0; i < rows.length; i++) {
         rows[i].onclick = function () {
@@ -1355,21 +1210,17 @@
             });
 
             var features = geojson.getSource().getFeatures();
-            //alert(features.length);
             for (i = 0; i < features.length; i++) {
               if (features[i].getId() == id) {
                 featureOverlay.getSource().addFeature(features[i]);
-
                 featureOverlay.getSource().on('addfeature', function () {
                   map.getView().fit(
                     featureOverlay.getSource().getExtent(),
                     { duration: 1590, size: map.getSize() }
                   );
                 });
-
               }
             }
-            //alert("id:" + id);
           };
         }(rows[i]);
       }
@@ -1381,30 +1232,21 @@
         function (feature, layer) {
           return feature;
         });
-
       if (feature) {
-
         var geometry = feature.getGeometry();
         var coord = geometry.getCoordinates();
         var coordinate = evt.coordinate;
-        //alert(feature.get('gid'));
-        // alert(coordinate);
         /*var content1 = '<h3>' + feature.get([name]) + '</h3>';
         content1 += '<h5>' + feature.get('crop')+' '+ value_param +' '+ value_seas+' '+value_level+'</h5>'
     content1 += '<h5>' + feature.get([value_param]) +' '+ unit +'</h5>';
   	
-       // alert(content1);
         content.innerHTML = content1;
         overlay.setPosition(coordinate);*/
-
-        // console.info(feature.getProperties());
-
         $(function () {
           $("#table td").each(function () {
             $(this).parent("tr").css("background-color", "white");
           });
         });
-
         featureOverlay.getSource().addFeature(feature);
       }
 
@@ -1422,75 +1264,54 @@
       var heads = table.getElementsByTagName('th');
       var col_no;
       for (var i = 0; i < heads.length; i++) {
-        // Take each cell
         var head = heads[i];
-        //alert(head.innerHTML);
         if (head.innerHTML == 'id') {
           col_no = i + 1;
-          //alert(col_no);
         }
-
       }
       var row_no = findRowNumber(col_no, feature.getId());
-      //alert(row_no);
       var rows = document.querySelectorAll('#table tr');
       rows[row_no].scrollIntoView({
         behavior: 'smooth',
         block: 'center'
       });
-
       $(document).ready(function () {
         $("#table td:nth-child(" + col_no + ")").each(function () {
 
           if ($(this).text() == feature.getId()) {
             $(this).parent("tr").css("background-color", "grey");
-
           }
         });
       });
     };
 
     function query() {
-
       $('#table').empty();
       if (geojson) {
         map.removeLayer(geojson);
       }
-
       if (featureOverlay) {
         featureOverlay.getSource().clear();
         map.removeLayer(featureOverlay);
       }
-      //alert('jsbchdb');	
       var layer = document.getElementById("layer");
       var value_layer = layer.options[layer.selectedIndex].value;
-      //alert(value_layer);
-
       var attribute = document.getElementById("attributes");
       var value_attribute = attribute.options[attribute.selectedIndex].text;
-      //alert(value_attribute);
-
       var operator = document.getElementById("operator");
       var value_operator = operator.options[operator.selectedIndex].value;
-      //alert(value_operator);
-
       var txt = document.getElementById("value");
       var value_txt = txt.value;
-
       if (value_operator == 'ILike') {
         value_txt = "" + value_txt + "%25";
-        //alert(value_txt);
         //value_attribute = 'strToLowerCase('+value_attribute+')';
       }
       else {
         value_txt = value_txt;
         //value_attribute = value_attribute;
       }
-      //alert(value_txt);
 
-      var url = geoService+"/geoserver/ows?geoService=WFS&version=1.0.0&request=GetFeature&typeName=" + value_layer + "&CQL_FILTER=" + value_attribute + "+" + value_operator + "+'" + value_txt + "'&outputFormat=application/json"
-      //alert(url);
-
+      var url = geoserverURL+"/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=" + value_layer + "&CQL_FILTER=" + value_attribute + "+" + value_operator + "+'" + value_txt + "'&outputFormat=application/json"
       var style = new ol.style.Style({
         fill: new ol.style.Fill({
           color: 'rgba(255, 255, 255, 0.7)'
@@ -1499,7 +1320,6 @@
           color: '#ffcc33',
           width: 3
         }),
-
         image: new ol.style.Circle({
           radius: 7,
           fill: new ol.style.Fill({
@@ -1507,6 +1327,7 @@
           })
         })
       });
+
 
       geojson = new ol.layer.Vector({
         //title:'dfdfd',
@@ -1519,14 +1340,11 @@
       });
 
       geojson.getSource().on('addfeature', function () {
-        //alert(geojson.getSource().getExtent());
         map.getView().fit(
           geojson.getSource().getExtent(),
           { duration: 1590, size: map.getSize() }
         );
       });
-
-      //overlays.getLayers().push(geojson);
       map.addLayer(geojson);
 
       $.getJSON(url, function (data) {
@@ -1545,20 +1363,19 @@
         }
 
         var table = document.createElement("table");
-
         table.setAttribute("class", "table table-bordered");
         table.setAttribute("id", "table");
-        // 使用上面提取的标题创建HTML表格标题行.
+        // 使用上面提取的标题创建HTML表格标题行
 
-        var tr = table.insertRow(-1);                   // 表格行.
+        var tr = table.insertRow(-1);                   // TABLE ROW.
 
         for (var i = 0; i < col.length; i++) {
-          var th = document.createElement("th");      // 表格头.
+          var th = document.createElement("th");      // TABLE HEADER.
           th.innerHTML = col[i];
           tr.appendChild(th);
         }
 
-        // 将JSON数据作为行添加到表中.
+        //将JSON数据作为行添加到表中.
         for (var i = 0; i < data.features.length; i++) {
 
           tr = table.insertRow(-1);
@@ -1567,14 +1384,14 @@
             var tabCell = tr.insertCell(-1);
             if (j == 0) { tabCell.innerHTML = data.features[i]['id']; }
             else {
-              //alert(data.features[i]['id']);
               tabCell.innerHTML = data.features[i].properties[col[j]];
-              //alert(tabCell.innerHTML);
             }
           }
         }
 
-        // 最后，将新创建的包含JSON数据的表添加到容器中.
+
+
+        // 最后，将新创建的包含JSON数据的表添加到容器中
         var divContainer = document.getElementById("table_data");
         divContainer.innerHTML = "";
         divContainer.appendChild(table);
@@ -1584,6 +1401,7 @@
         document.getElementById('table_data').style.height = '25%';
         //map.updateSize();
       });
+
       map.on('click', highlight);
       addRowHandlers();
     }
@@ -1592,7 +1410,7 @@
     $(document).ready(function () {
       $.ajax({
         type: "GET",
-        url: geoService+"/geoserver/wfs?request=getCapabilities",
+        url: geoserverURL+"/geoserver/wfs?request=getCapabilities",
         dataType: "xml",
         success: function (xml) {
           var select = $('#layer1');
@@ -1611,6 +1429,7 @@
       });
     });
 
+
     // 绘制形状
     var source1 = new ol.source.Vector({ wrapX: false });
 
@@ -1619,7 +1438,8 @@
     });
     map.addLayer(vector1);
     var draw_typeSelect = document.getElementById('draw_type');
-    var draw1; // global so we can remove it later
+
+    var draw1; // 全局，以便我们稍后删除它
     function add_draw_Interaction() {
       var value = draw_typeSelect.value;
       //alert(value);
@@ -1628,15 +1448,12 @@
         if (value === 'Square') {
           value = 'Circle';
           geometryFunction = new ol.interaction.Draw.createRegularPolygon(4);
-
         } else if (value === 'Box') {
           value = 'Circle';
           geometryFunction = new ol.interaction.Draw.createBox();
-
         } else if (value === 'Star') {
           value = 'Circle';
           geometryFunction = function (coordinates, geometry) {
-            //alert(value);
             var center = coordinates[0];
             var last = coordinates[1];
             var dx = center[0] - last[0];
@@ -1672,10 +1489,8 @@
           map.removeInteraction(draw1);
           vector1.getSource().clear();
           if (geojson) { geojson.getSource().clear(); map.removeLayer(geojson); }
-
         }
         else if (draw_typeSelect.value == 'Square' || draw_typeSelect.value == 'Polygon' || draw_typeSelect.value == 'Circle' || draw_typeSelect.value == 'Star' || draw_typeSelect.value == 'Box') {
-
           map.addInteraction(draw1);
           draw1.on('drawstart', function (evt) {
             if (vector1) { vector1.getSource().clear(); }
@@ -1685,15 +1500,12 @@
           draw1.on('drawend', function (evt) {
             var feature = evt.feature;
             var coords = feature.getGeometry();
-            //alert(coords.toString());
             var format = new ol.format.WKT();
             var wkt = format.writeGeometry(coords);
-            //alert(wkt);
             var layer_name = document.getElementById("layer1");
             var value_layer = layer_name.options[layer_name.selectedIndex].value;
 
-            var url = geoService+"/geoserver/wfs?request=GetFeature&version=1.0.0&typeName=" + value_layer + "&outputFormat=json&cql_filter=INTERSECTS(the_geom," + wkt + ")";
-            //alert(url);
+            var url = geoserverURL+"/geoserver/wfs?request=GetFeature&version=1.0.0&typeName=" + value_layer + "&outputFormat=json&cql_filter=INTERSECTS(the_geom," + wkt + ")";
             /*var style = new ol.style.Style({
                     fill: new ol.style.Fill({
                       color: 'rgba(255, 255, 255, 0.7)'
@@ -1734,6 +1546,7 @@
             });
 
             geojson = new ol.layer.Vector({
+
               //title: '<h5>' + value_crop+' '+ value_param +' '+ value_seas+' '+value_level+'</h5>',
               source: new ol.source.Vector({
                 url: url,
@@ -1745,7 +1558,6 @@
             });
 
             geojson.getSource().on('addfeature', function () {
-              //alert(geojson.getSource().getExtent());
               map.getView().fit(
                 geojson.getSource().getExtent(),
                 { duration: 1590, size: map.getSize() }
@@ -1756,34 +1568,30 @@
             map.addLayer(geojson);
             map.removeInteraction(draw1);
             $.getJSON(url, function (data) {
-              //alert(data.features[0].properties);
-              //alert(data.features.length);
               var col = [];
               col.push('id');
               for (var i = 0; i < data.features.length; i++) {
-
                 for (var key in data.features[i].properties) {
-
                   if (col.indexOf(key) === -1) {
                     col.push(key);
                   }
                 }
               }
-              var table = document.createElement("table");
 
+              var table = document.createElement("table");
               table.setAttribute("class", "table table-bordered");
               table.setAttribute("id", "table");
-              // 使用上面提取的标题创建HTML表格标题行.
+              //使用上面提取的标题创建HTML表格标题行。
 
-              var tr = table.insertRow(-1);                   // 表格行.
+              var tr = table.insertRow(-1);                   // TABLE ROW.
 
               for (var i = 0; i < col.length; i++) {
-                var th = document.createElement("th");      // 表头.
+                var th = document.createElement("th");      // TABLE HEADER.
                 th.innerHTML = col[i];
                 tr.appendChild(th);
               }
 
-              // 将JSON数据作为行添加到表中.
+              // 将JSON数据作为行添加到表中
               for (var i = 0; i < data.features.length; i++) {
 
                 tr = table.insertRow(-1);
@@ -1792,19 +1600,16 @@
                   var tabCell = tr.insertCell(-1);
                   if (j == 0) { tabCell.innerHTML = data.features[i]['id']; }
                   else {
-                    //alert(data.features[i]['id']);
                     tabCell.innerHTML = data.features[i].properties[col[j]];
-                    //alert(tabCell.innerHTML);
                   }
                 }
               }
 
-              // 最后，将新创建的包含JSON数据的表添加到容器中.
+              //最后，将新创建的包含JSON数据的表添加到容器中
               var divContainer = document.getElementById("table_data");
               divContainer.innerHTML = "";
               divContainer.appendChild(table);
               addRowHandlers();
-
               document.getElementById('map').style.height = '71%';
               document.getElementById('table_data').style.height = '25%';
               map.updateSize();
@@ -1817,7 +1622,7 @@
     }
 
     /**
-     * 处理更改事件.
+     * 处理更改事件。
      */
     draw_typeSelect.onchange = function () {
       map.removeInteraction(draw1);
@@ -1829,10 +1634,9 @@
       if (measureTooltipElement) {
         var elem = document.getElementsByClassName("tooltip tooltip-static");
         //$('#measure_tool').empty(); 
-        //alert(elem.length);
+
         for (var i = elem.length - 1; i >= 0; i--) {
           elem[i].remove();
-          //alert(elem[i].innerHTML);
         }
       }
       add_draw_Interaction();
@@ -1856,7 +1660,6 @@
         var elem = document.getElementsByClassName("tooltip tooltip-static");
         for (var i = elem.length - 1; i >= 0; i--) {
           elem[i].remove();
-          //alert(elem[i].innerHTML);
         }
       }
       map.un('singleclick', getinfo);
