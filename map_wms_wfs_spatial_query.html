@@ -420,7 +420,8 @@
     var map, geojson, layer_name, layerSwitcher, featureOverlay;
     var container, content, closer;
 
-
+    var geoService="http://localhost:8085";
+    
     var container = document.getElementById('popup');
     var content = document.getElementById('popup-content');
     var closer = document.getElementById('popup-closer');
@@ -450,14 +451,14 @@
 
     var view = new ol.View({
       projection: 'EPSG:4326',
-      center: [78.0, 23.0],
-      zoom: 5,
+      center: [-73.97, 40.77],
+      zoom: 12,
 
     });
     var view_ov = new ol.View({
       projection: 'EPSG:4326',
-      center: [78.0, 23.0],
-      zoom: 5,
+      center: [-73.97, 40.77],
+      zoom: 12,
     });
 
 
@@ -483,22 +484,22 @@
       'title': 'Overlays',
       layers: [
         new ol.layer.Image({
-          title: 'states',
+          title: 'poly_landmarks',
           // extent: [-180, -90, -180, 90],
           source: new ol.source.ImageWMS({
-            url: 'http://localhost:8085/geoserver/wms',
-            params: { 'LAYERS': 'topp:states' },
+            url: geoService+'/geoserver/wms',
+            params: { 'LAYERS': 'tiger:poly_landmarks' },
             
             ratio: 1,
             serverType: 'geoserver'
           })
         }),
         new ol.layer.Image({
-          title: 'tasmania_state_boundaries',
+          title: 'tiger_roads',
           // extent: [-180, -90, -180, 90],
           source: new ol.source.ImageWMS({
-            url: 'http://localhost:8085/geoserver/wms',
-            params: { 'LAYERS': 'topp:tasmania_state_boundaries' },
+            url: geoService+'/geoserver/wms',
+            params: { 'LAYERS': 'tiger:tiger_roads' },
             ratio: 1,
             serverType: 'geoserver'
           })
@@ -518,11 +519,11 @@
     map.addLayer(overlays);
 
     var rainfall = new ol.layer.Image({
-      title: 'tasmania_state_boundaries',
+      title: 'poi',
       // extent: [-180, -90, -180, 90],
       source: new ol.source.ImageWMS({
-        url: 'http://localhost:8085/geoserver/wms',
-        params: { 'LAYERS': 'topp:tasmania_state_boundaries' },
+        url: geoService+'/geoserver/wms',
+        params: { 'LAYERS': 'tiger:poi' },
         ratio: 1,
         serverType: 'geoserver'
       })
@@ -587,7 +588,7 @@
       var ar = [];
       var i;
       for (i = 0; i < no_layers; i++) {
-        ar.push("http://localhost:8085/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=" + overlays.getLayers().item(i).get('title'));
+        ar.push(geoService+"/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=" + overlays.getLayers().item(i).get('title'));
         //alert(overlays.getLayers().item(i).get('title'));
       }
       for (i = 0; i < no_layers; i++) {
@@ -610,13 +611,7 @@
 
     legend();
 
-
-
-
-
     function getinfo(evt) {
-
-
       var coordinate = evt.coordinate;
       var viewResolution = /** @type {number} */ (view.getResolution());
 
@@ -641,7 +636,7 @@
           layer_title[i] = overlays.getLayers().item(i).get('title');
           //alert(layer_title[i]);
           wmsSource[i] = new ol.source.ImageWMS({
-            url: 'http://localhost:8085/geoserver/wms',
+            url: geoService+'/geoserver/wms',
             params: { 'LAYERS': layer_title[i] },
             serverType: 'geoserver',
             crossOrigin: 'anonymous'
@@ -675,15 +670,9 @@
           });
           //alert(layer_title[i]);
           //alert(fid1[0]);
-
-
-
         }
       }
-
-
     }
-
 
     //map.on('singleclick', getinfo);
     // map.un('singleclick', getinfo);
@@ -981,10 +970,8 @@
             createMeasureTooltip();
             ol.Observable.unByKey(listener);
           }, this);
-
       }
     }
-
 
     /**
      * Creates a new help tooltip
@@ -1003,7 +990,6 @@
       map.addOverlay(helpTooltip);
     }
 
-
     /**
      * Creates a new measure tooltip
      */
@@ -1020,7 +1006,6 @@
         positioning: 'bottom-center'
       });
       map.addOverlay(measureTooltip);
-
     }
 
 
@@ -1039,22 +1024,19 @@
 
     function wms_layers() {
       //alert('jdgf');
-
       $(function () {
-
         $("#wms_layers_window").dialog({
           height: 400,
           width: 800,
           modal: true
         });
         $("#wms_layers_window").show();
-
       });
 
       $(document).ready(function () {
         $.ajax({
           type: "GET",
-          url: "http://localhost:8085/geoserver/wms?request=getCapabilities",
+          url: geoService+"/geoserver/wms?request=getCapabilities",
           dataType: "xml",
           success: function (xml) {
             $('#table_wms_layers').empty();
@@ -1066,34 +1048,26 @@
               //var name1 = name.find('Name').text();
               //alert(name);
               var title = $(this).children('Title').text();
-
               var abst = $(this).children('Abstract').text();
               //   alert(abst);
-
-
               //   alert('test');
               $('<tr></tr>').html('<td>' + name + '</td><td>' + title + '</td><td>' + abst + '</td>').appendTo('#table_wms_layers');
-
-
             });
             addRowHandlers();
           }
         });
       });
 
-
       var divContainer = document.getElementById("wms_layers_window");
       var table1 = document.getElementById("table_wms_layers");
       divContainer.innerHTML = "";
       divContainer.appendChild(table1);
       $("#wms_layers_window").show();
-
       var add_map_btn = document.createElement("BUTTON");
       add_map_btn.setAttribute("id", "add_map_btn");
       add_map_btn.innerHTML = "Add Layer to Map";
       add_map_btn.setAttribute("onclick", "add_layer()");
       divContainer.appendChild(add_map_btn);
-
       /*	function findRowNumber(cn1, v1){
       var table = document.querySelector('#table1');
       var rows = table.querySelectorAll("tr");
@@ -1108,7 +1082,6 @@
       return msg;
     }
     */
-
       function addRowHandlers() {
         //alert('knd');
         var rows = document.getElementById("table_wms_layers").rows;
@@ -1123,13 +1096,11 @@
             col_no = i + 1;
             //alert(col_no);
           }
-
         }
         for (i = 0; i < rows.length; i++) {
 
           rows[i].onclick = function () {
             return function () {
-
               $(function () {
                 $("#table_wms_layers td").each(function () {
                   $(this).parent("tr").css("background-color", "white");
@@ -1138,18 +1109,13 @@
               var cell = this.cells[col_no - 1];
               layer_name = cell.innerHTML;
               // alert(layer_name);
-
               $(document).ready(function () {
                 $("#table_wms_layers td:nth-child(" + col_no + ")").each(function () {
                   if ($(this).text() == layer_name) {
                     $(this).parent("tr").css("background-color", "grey");
-
-
-
                   }
                 });
               });
-
               //alert("id:" + id);
             };
           }(rows[i]);
@@ -1160,22 +1126,18 @@
              alert(layer_name);
          });*/
       }
-
     }
 
     function add_layer() {
       //alert("jd"); 
-
       //alert(layer_name);
       //map.removeControl(layerSwitcher);
-
       var name = layer_name.split(":");
-
       var layer_wms = new ol.layer.Image({
         title: name[1],
         // extent: [-180, -90, -180, 90],
         source: new ol.source.ImageWMS({
-          url: 'http://localhost:8085/geoserver/wms',
+          url: geoService+'/geoserver/wms',
           params: { 'LAYERS': layer_name },
           ratio: 1,
           serverType: 'geoserver'
@@ -1183,10 +1145,8 @@
       });
       overlays.getLayers().push(layer_wms);
 
-      var url = 'http://localhost:8085/geoserver/wms?request=getCapabilities';
+      var url = geoService+'/geoserver/wms?request=getCapabilities';
       var parser = new ol.format.WMSCapabilities();
-
-
       $.ajax(url).then(function (response) {
         //window.alert("word");
         var result = parser.read(response);
@@ -1228,7 +1188,7 @@
     $(document).ready(function () {
       $.ajax({
         type: "GET",
-        url: "http://localhost:8085/geoserver/wfs?request=getCapabilities",
+        url: geoService+"/geoserver/wfs?request=getCapabilities",
         dataType: "xml",
         success: function (xml) {
           var select = $('#layer');
@@ -1248,7 +1208,6 @@
     });
 
     // attributes_dropdown
-
     $(function () {
       $("#layer").change(function () {
 
@@ -1263,10 +1222,7 @@
 
         //var level = document.getElementById("level");
         //var value_level = level.options[level.selectedIndex].value;
-
-        // var url = "http://localhost:8085/geoserver/wfs?service=WFS&request=DescribeFeatureType&version=1.1.0&typeName="+value_layer;
-
-
+        // var url = geoService+"/geoserver/wfs?geoService=WFS&request=DescribeFeatureType&version=1.1.0&typeName="+value_layer;
         //  alert(url);
 
         attributes.options[0] = new Option('Select attributes', "");
@@ -1275,7 +1231,7 @@
         $(document).ready(function () {
           $.ajax({
             type: "GET",
-            url: "http://localhost:8085/geoserver/wfs?service=WFS&request=DescribeFeatureType&version=1.1.0&typeName=" + value_layer,
+            url: geoService+"/geoserver/wfs?geoService=WFS&request=DescribeFeatureType&version=1.1.0&typeName=" + value_layer,
             dataType: "xml",
             success: function (xml) {
 
@@ -1293,16 +1249,12 @@
                     select.append("<option class='ddindent' value='" + type + "'>" + value + "</option>");
                   }
                 });
-
               });
             }
           });
         });
-
-
       });
     });
-
 
     // operator combo
     $(function () {
@@ -1313,7 +1265,6 @@
         for (i = length - 1; i >= 0; i--) {
           operator.options[i] = null;
         }
-
         var value_type = $(this).val();
         // alert(value_type);
         var value_attribute = $('#attributes option:selected').text();
@@ -1328,9 +1279,7 @@
         else if (value_type == 'xsd:string') {
           var operator1 = document.getElementById("operator");
           operator1.options[1] = new Option('Like', 'ILike');
-
         }
-
       });
     });
 
@@ -1358,7 +1307,6 @@
     var highlight1;
 
     function findRowNumber(cn1, v1) {
-
       var table = document.querySelector('#table');
       var rows = table.querySelectorAll("tr");
       var msg = "No such row exist"
@@ -1372,7 +1320,6 @@
       return msg;
     }
 
-
     function addRowHandlers() {
       var rows = document.getElementById("table").rows;
       var heads = table.getElementsByTagName('th');
@@ -1385,12 +1332,8 @@
           col_no = i + 1;
           //alert(col_no);
         }
-
       }
       for (i = 0; i < rows.length; i++) {
-
-
-
         rows[i].onclick = function () {
           return function () {
             featureOverlay.getSource().clear();
@@ -1402,8 +1345,6 @@
             });
             var cell = this.cells[col_no - 1];
             var id = cell.innerHTML;
-
-
             $(document).ready(function () {
               $("#table td:nth-child(" + col_no + ")").each(function () {
                 if ($(this).text() == id) {
@@ -1414,12 +1355,7 @@
 
             var features = geojson.getSource().getFeatures();
             //alert(features.length);
-
-
             for (i = 0; i < features.length; i++) {
-
-
-
               if (features[i].getId() == id) {
                 featureOverlay.getSource().addFeature(features[i]);
 
@@ -1432,14 +1368,11 @@
 
               }
             }
-
             //alert("id:" + id);
           };
         }(rows[i]);
       }
     }
-
-
 
     function highlight(evt) {
       featureOverlay.getSource().clear();
@@ -1474,16 +1407,6 @@
         featureOverlay.getSource().addFeature(feature);
       }
 
-
-
-
-
-
-
-
-
-
-
       /*$(function() {
     $("#table td").each(function() {
       if ($(this).text() == feature.get('gid')) {
@@ -1492,8 +1415,6 @@
       }
     });
   });*/
-
-
       var table = document.getElementById('table');
       var cells = table.getElementsByTagName('td');
       var rows = document.getElementById("table").rows;
@@ -1511,9 +1432,7 @@
       }
       var row_no = findRowNumber(col_no, feature.getId());
       //alert(row_no);
-
       var rows = document.querySelectorAll('#table tr');
-
       rows[row_no].scrollIntoView({
         behavior: 'smooth',
         block: 'center'
@@ -1528,10 +1447,6 @@
           }
         });
       });
-
-
-
-
     };
 
     function query() {
@@ -1539,13 +1454,11 @@
       $('#table').empty();
       if (geojson) {
         map.removeLayer(geojson);
-
       }
 
       if (featureOverlay) {
         featureOverlay.getSource().clear();
         map.removeLayer(featureOverlay);
-
       }
       //alert('jsbchdb');	
       var layer = document.getElementById("layer");
@@ -1574,10 +1487,7 @@
       }
       //alert(value_txt);
 
-
-
-
-      var url = "http://localhost:8085/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=" + value_layer + "&CQL_FILTER=" + value_attribute + "+" + value_operator + "+'" + value_txt + "'&outputFormat=application/json"
+      var url = geoService+"/geoserver/ows?geoService=WFS&version=1.0.0&request=GetFeature&typeName=" + value_layer + "&CQL_FILTER=" + value_attribute + "+" + value_operator + "+'" + value_txt + "'&outputFormat=application/json"
       //alert(url);
 
       var style = new ol.style.Style({
@@ -1597,7 +1507,6 @@
         })
       });
 
-
       geojson = new ol.layer.Vector({
         //title:'dfdfd',
         //title: '<h5>' + value_crop+' '+ value_param +' '+ value_seas+' '+value_level+'</h5>',
@@ -1606,7 +1515,6 @@
           format: new ol.format.GeoJSON()
         }),
         style: style,
-
       });
 
       geojson.getSource().on('addfeature', function () {
@@ -1619,11 +1527,6 @@
 
       //overlays.getLayers().push(geojson);
       map.addLayer(geojson);
-
-
-
-
-
 
       $.getJSON(url, function (data) {
         //alert(data.features[0].properties);
@@ -1640,10 +1543,7 @@
           }
         }
 
-
-
         var table = document.createElement("table");
-
 
         table.setAttribute("class", "table table-bordered");
         table.setAttribute("id", "table");
@@ -1673,8 +1573,6 @@
           }
         }
 
-
-
         // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
         var divContainer = document.getElementById("table_data");
         divContainer.innerHTML = "";
@@ -1685,25 +1583,15 @@
         document.getElementById('table_data').style.height = '25%';
         //map.updateSize();
       });
-
-
       map.on('click', highlight);
-
       addRowHandlers();
-
-
-
-
-
     }
 
     // Draw_layer_dropdown
-
-    // 
     $(document).ready(function () {
       $.ajax({
         type: "GET",
-        url: "http://localhost:8085/geoserver/wfs?request=getCapabilities",
+        url: geoService+"/geoserver/wfs?request=getCapabilities",
         dataType: "xml",
         success: function (xml) {
           var select = $('#layer1');
@@ -1722,9 +1610,7 @@
       });
     });
 
-
     // draw shapes
-
     var source1 = new ol.source.Vector({ wrapX: false });
 
     var vector1 = new ol.layer.Vector({
@@ -1732,8 +1618,6 @@
     });
     map.addLayer(vector1);
     var draw_typeSelect = document.getElementById('draw_type');
-
-
     var draw1; // global so we can remove it later
     function add_draw_Interaction() {
       var value = draw_typeSelect.value;
@@ -1746,7 +1630,6 @@
 
         } else if (value === 'Box') {
           value = 'Circle';
-
           geometryFunction = new ol.interaction.Draw.createBox();
 
         } else if (value === 'Star') {
@@ -1785,7 +1668,6 @@
         // map.addInteraction(draw1);
 
         if (draw_typeSelect.value == 'select' || draw_typeSelect.value == 'clear') {
-
           map.removeInteraction(draw1);
           vector1.getSource().clear();
           if (geojson) { geojson.getSource().clear(); map.removeLayer(geojson); }
@@ -1794,13 +1676,9 @@
         else if (draw_typeSelect.value == 'Square' || draw_typeSelect.value == 'Polygon' || draw_typeSelect.value == 'Circle' || draw_typeSelect.value == 'Star' || draw_typeSelect.value == 'Box') {
 
           map.addInteraction(draw1);
-
           draw1.on('drawstart', function (evt) {
             if (vector1) { vector1.getSource().clear(); }
             if (geojson) { geojson.getSource().clear(); map.removeLayer(geojson); }
-
-            //alert('bc');
-
           });
 
           draw1.on('drawend', function (evt) {
@@ -1813,7 +1691,7 @@
             var layer_name = document.getElementById("layer1");
             var value_layer = layer_name.options[layer_name.selectedIndex].value;
 
-            var url = "http://localhost:8085/geoserver/wfs?request=GetFeature&version=1.0.0&typeName=" + value_layer + "&outputFormat=json&cql_filter=INTERSECTS(the_geom," + wkt + ")";
+            var url = geoService+"/geoserver/wfs?request=GetFeature&version=1.0.0&typeName=" + value_layer + "&outputFormat=json&cql_filter=INTERSECTS(the_geom," + wkt + ")";
             //alert(url);
             /*var style = new ol.style.Style({
                     fill: new ol.style.Fill({
@@ -1855,7 +1733,6 @@
             });
 
             geojson = new ol.layer.Vector({
-
               //title: '<h5>' + value_crop+' '+ value_param +' '+ value_seas+' '+value_level+'</h5>',
               source: new ol.source.Vector({
                 url: url,
@@ -1891,11 +1768,7 @@
                   }
                 }
               }
-
-
-
               var table = document.createElement("table");
-
 
               table.setAttribute("class", "table table-bordered");
               table.setAttribute("id", "table");
@@ -1925,8 +1798,6 @@
                 }
               }
 
-
-
               // FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
               var divContainer = document.getElementById("table_data");
               divContainer.innerHTML = "";
@@ -1937,24 +1808,12 @@
               document.getElementById('table_data').style.height = '25%';
               map.updateSize();
             });
-
-
             map.on('click', highlight);
-
             addRowHandlers();
-
           });
-
-
-
-
-
         }
-
-
       }
     }
-
 
     /**
      * Handle change event.
@@ -1969,15 +1828,12 @@
       if (measureTooltipElement) {
         var elem = document.getElementsByClassName("tooltip tooltip-static");
         //$('#measure_tool').empty(); 
-
         //alert(elem.length);
         for (var i = elem.length - 1; i >= 0; i--) {
-
           elem[i].remove();
           //alert(elem[i].innerHTML);
         }
       }
-
       add_draw_Interaction();
     };
 
@@ -1997,9 +1853,7 @@
       map.removeOverlay(helpTooltip);
       if (measureTooltipElement) {
         var elem = document.getElementsByClassName("tooltip tooltip-static");
-
         for (var i = elem.length - 1; i >= 0; i--) {
-
           elem[i].remove();
           //alert(elem[i].innerHTML);
         }
@@ -2007,10 +1861,7 @@
       map.un('singleclick', getinfo);
       overlay.setPosition(undefined);
       closer.blur();
-
       map.un('click', highlight);
-
-
     }
 
   </script>

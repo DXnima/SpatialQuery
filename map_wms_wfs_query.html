@@ -398,6 +398,7 @@
     var map, geojson, layer_name, layerSwitcher, featureOverlay;
     var container, content, closer;
 
+    var geoService="http://localhost:8085";
 
     var container = document.getElementById('popup');
     var content = document.getElementById('popup-content');
@@ -428,14 +429,14 @@
 
     var view = new ol.View({
       projection: 'EPSG:4326',
-      center: [116.0, 39.0],
-      zoom: 5,
+      center: [-73.97, 40.77],
+      zoom: 12,
 
     });
     var view_ov = new ol.View({
       projection: 'EPSG:4326',
-      center: [116.0, 39.0],
-      zoom: 5,
+      center: [-73.97, 40.77],
+      zoom: 12,
     });
 
 
@@ -461,21 +462,21 @@
       'title': 'Overlays',
       layers: [
         new ol.layer.Image({
-          title: 'province',
+          title: 'poly_landmarks',
           // extent: [-180, -90, -180, 90],
           source: new ol.source.ImageWMS({
-            url: 'http://localhost:8085/geoserver/wms',
-            params: { 'LAYERS': '	webgistest:province' },
+            url: geoService+'/geoserver/wms',
+            params: { 'LAYERS': 'tiger:poly_landmarks' },
             ratio: 1,
             serverType: 'geoserver'
           })
         }),
         new ol.layer.Image({
-          title: 'capital',
+          title: 'tiger_roads',
           // extent: [-180, -90, -180, 90],
           source: new ol.source.ImageWMS({
-            url: 'http://localhost:8085/geoserver/wms',
-            params: { 'LAYERS': 'webgistest:capital' },
+            url: geoService+'/geoserver/wms',
+            params: { 'LAYERS': 'tiger:tiger_roads' },
             ratio: 1,
             serverType: 'geoserver'
           })
@@ -495,11 +496,11 @@
     map.addLayer(overlays);
 
     var rainfall = new ol.layer.Image({
-      title: 'road',
+      title: 'poi',
       // extent: [-180, -90, -180, 90],
       source: new ol.source.ImageWMS({
-        url: 'http://localhost:8085/geoserver/wms',
-        params: { 'LAYERS': '	webgistest:road' },
+        url: geoService+'/geoserver/wms',
+        params: { 'LAYERS': 'tiger:poi' },
         ratio: 1,
         serverType: 'geoserver'
       })
@@ -564,7 +565,7 @@
       var ar = [];
       var i;
       for (i = 0; i < no_layers; i++) {
-        ar.push("http://localhost:8085/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=" + overlays.getLayers().item(i).get('title'));
+        ar.push(geoService+"/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=" + overlays.getLayers().item(i).get('title'));
         //alert(overlays.getLayers().item(i).get('title'));
       }
       for (i = 0; i < no_layers; i++) {
@@ -618,7 +619,7 @@
           layer_title[i] = overlays.getLayers().item(i).get('title');
           //alert(layer_title[i]);
           wmsSource[i] = new ol.source.ImageWMS({
-            url: 'http://localhost:8085/geoserver/wms',
+            url: geoService+'/geoserver/wms',
             params: { 'LAYERS': layer_title[i] },
             serverType: 'geoserver',
             crossOrigin: 'anonymous'
@@ -1028,7 +1029,7 @@
       $(document).ready(function () {
         $.ajax({
           type: "GET",
-          url: "http://localhost:8085/geoserver/wms?request=getCapabilities",
+          url: geoService+"/geoserver/wms?request=getCapabilities",
           dataType: "xml",
           success: function (xml) {
             $('#table_wms_layers').empty();
@@ -1135,7 +1136,7 @@
         title: name[1],
         // extent: [-180, -90, -180, 90],
         source: new ol.source.ImageWMS({
-          url: 'http://localhost:8085/geoserver/wms',
+          url: geoService+'/geoserver/wms',
           params: { 'LAYERS': layer_name },
           ratio: 1,
           serverType: 'geoserver'
@@ -1143,7 +1144,7 @@
       });
       overlays.getLayers().push(layer_wms);
 
-      var url = 'http://localhost:8085/geoserver/wms?request=getCapabilities';
+      var url = geoService+'/geoserver/wms?request=getCapabilities';
       var parser = new ol.format.WMSCapabilities();
 
 
@@ -1188,7 +1189,7 @@
     $(document).ready(function () {
       $.ajax({
         type: "GET",
-        url: "http://localhost:8085/geoserver/wfs?request=getCapabilities",
+        url: geoService+"/geoserver/wfs?request=getCapabilities",
         dataType: "xml",
         success: function (xml) {
           var select = $('#layer');
@@ -1227,7 +1228,7 @@
         $(document).ready(function () {
           $.ajax({
             type: "GET",
-            url: "http://localhost:8085/geoserver/wfs?service=WFS&request=DescribeFeatureType&version=1.1.0&typeName=" + value_layer,
+            url: geoService+"/geoserver/wfs?service=WFS&request=DescribeFeatureType&version=1.1.0&typeName=" + value_layer,
             dataType: "xml",
             success: function (xml) {
 
@@ -1498,7 +1499,7 @@
       //alert(value_txt);
 
 
-      var url = "http://localhost:8085/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=" + value_layer + "&CQL_FILTER=" + value_attribute + "+" + value_operator + "+'" + value_txt + "'&outputFormat=application/json"
+      var url = geoService+"/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=" + value_layer + "&CQL_FILTER=" + value_attribute + "+" + value_operator + "+'" + value_txt + "'&outputFormat=application/json"
       //alert(url);
 
       var style = new ol.style.Style({
